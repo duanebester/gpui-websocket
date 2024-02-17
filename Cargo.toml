@@ -1,5 +1,5 @@
 [workspace]
 
-members = ["ws-server", "twitchat"]
+members = ["ws-server", "chat"]
 
 workspace.resolver = "2"

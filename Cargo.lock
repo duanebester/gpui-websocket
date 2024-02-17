@@ -518,6 +518,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 
 [[package]]
+name = "chat"
+version = "0.1.0"
+dependencies = [
+ "gpui",
+ "tungstenite 0.21.0",
+ "url",
+]
+
+[[package]]
 name = "clang-sys"
 version = "1.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3785,15 +3794,6 @@ dependencies = [
  "thiserror",
  "url",
  "utf-8",
-]
-
-[[package]]
-name = "twitchat"
-version = "0.1.0"
-dependencies = [
- "gpui",
- "tungstenite 0.21.0",
- "url",
 ]
 
 [[package]]
