@@ -37,6 +37,7 @@ impl Chat {
         })
     }
 
+    // Lovingly "lifted" from https://github.com/MatthiasGrandl/Loungy
     pub fn options(bounds: Bounds<GlobalPixels>) -> WindowOptions {
         let mut options = WindowOptions::default();
         let center = bounds.center();
