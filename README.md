@@ -8,5 +8,6 @@ Messing around with [GPUI](https://gpui.rs) and Websockets. Not really sure what
 
 `chat` is a simple window that displays the lastest chat that has been received from the server.
 
+Run the `ws-server` first and then the `chat` app as we don't handle any errors or retries yet.
 
 Youtube link - https://youtu.be/WQt4ur7fcd0
