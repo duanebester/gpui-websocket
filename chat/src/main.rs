@@ -1,8 +1,10 @@
-mod chat;
+mod app;
+mod state;
 mod websocket;
+mod workspace;
 use gpui::*;
 
 fn main() {
     let app = App::new();
-    chat::run_app(app);
+    app::run_app(app);
 }

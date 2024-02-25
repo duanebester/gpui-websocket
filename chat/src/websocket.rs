@@ -1,26 +1,47 @@
-use crate::chat::{Chat, ChatUpdated};
+use std::net::TcpStream;
+
 use gpui::*;
-use tungstenite::connect;
+use tungstenite::{stream::MaybeTlsStream, WebSocket};
 use url::Url;
 
-const CONNECTION: &'static str = "ws://127.0.0.1:3030/chat";
+use crate::state::*;
+
+const CONNECTION: &str = "ws://127.0.0.1:3030/chat";
 
 pub struct Websocket;
 
 impl Websocket {
-    pub fn listen(chat_model: Model<Chat>, cx: &mut WindowContext) {
-        let (mut socket, response) =
-            connect(Url::parse(CONNECTION).unwrap()).expect("Can't connect");
-        println!("Connected to the server: {:?}", response.status());
+    pub fn connect() -> WebSocket<MaybeTlsStream<TcpStream>> {
+        let (socket, _response) =
+            tungstenite::connect(Url::parse(CONNECTION).unwrap()).expect("Can't connect");
+
+        socket
+    }
+
+    pub fn listen(cx: &mut WindowContext) {
+        let state = cx.global::<StateModel>();
+        let model_clone = state.inner.clone();
+        let client_clone = state.client.clone();
 
         cx.spawn(|mut cx| async move {
             loop {
-                let msg = socket.read().expect("Error reading message");
+                // heartbeat
+                let _ = client_clone
+                    .lock()
+                    .unwrap()
+                    .send(tungstenite::Message::Ping(vec![0x00]));
+
+                let msg = client_clone
+                    .lock()
+                    .unwrap()
+                    .read()
+                    .expect("Error reading message");
+
                 match msg {
                     tungstenite::Message::Text(text) => {
                         println!("Received Text: {}", text);
-                        let _ = chat_model.update(&mut cx, |_chat, cx| {
-                            cx.emit(ChatUpdated {
+                        let _ = model_clone.update(&mut cx, |_chat, cx| {
+                            cx.emit(IncomingMessage {
                                 message: text.clone(),
                             });
                         });
@@ -29,18 +50,7 @@ impl Websocket {
                         println!("Connection closed");
                         break;
                     }
-                    tungstenite::Message::Ping(_) => {
-                        println!("Received Ping");
-                    }
-                    tungstenite::Message::Pong(_) => {
-                        println!("Received Pong");
-                    }
-                    tungstenite::Message::Frame(_) => {
-                        println!("Received Frame");
-                    }
-                    tungstenite::Message::Binary(_) => {
-                        println!("Received Binary");
-                    }
+                    _ => {}
                 }
 
                 cx.background_executor()
@@ -48,11 +58,7 @@ impl Websocket {
                     .await;
             }
 
-            println!("Closing socket");
-            let res = socket.close(None);
-            if let Err(e) = res {
-                println!("Error: {:?}", e);
-            }
+            // TODO: Handle close, reset state?
         })
         .detach();
     }

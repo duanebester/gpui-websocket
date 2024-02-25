@@ -130,6 +130,12 @@ static INDEX_HTML: &str = r#"<!DOCTYPE html>
 <html lang="en">
     <head>
         <title>Warp Chat</title>
+        <style>
+        body {
+          background-color:#333333;
+          color:#ffffff;
+        }
+        </style>
     </head>
     <body>
         <h1>Warp chat</h1>
